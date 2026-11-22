@@ -2,17 +2,47 @@
 'use strict';
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
-const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const FINE = matchMedia('(hover: hover) and (pointer: fine)').matches;
-const PHONE = /Android|iPhone|iPod/i.test(navigator.userAgent) || (matchMedia('(hover: none)').matches && innerWidth < 760);
-const TABLET = !PHONE && /iPad|Tablet/i.test(navigator.userAgent);
+const mm = q => { try { return matchMedia(q).matches; } catch (e) { return false; } };
+const UA = navigator.userAgent || '';
+const RM = mm('(prefers-reduced-motion: reduce)');
+const FINE = mm('(hover: hover) and (pointer: fine)');
+// iPadOS reports itself as a Mac; touch points give it away
+const IOS = /iPhone|iPad|iPod/i.test(UA) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const ANDROID = /Android/i.test(UA);
+// X's in-app browser: "Twitter for iPhone/x.y" (WKWebView) or "TwitterAndroid/x.y" (Android System WebView, "; wv")
+const IN_X = /Twitter for iP(hone|ad)|TwitterAndroid/i.test(UA);
+const WEBVIEW = IN_X || /; wv\)/.test(UA) || (IOS && !/Safari\//.test(UA));
+const LOW = (navigator.deviceMemory > 0 && navigator.deviceMemory <= 4) || (navigator.hardwareConcurrency > 0 && navigator.hardwareConcurrency <= 4);
+const PHONE = /Android|iPhone|iPod/i.test(UA) || (mm('(hover: none)') && innerWidth < 760);
+const TABLET = !PHONE && (/iPad|Tablet/i.test(UA) || IOS);
+const LITE = ANDROID || LOW; // cheaper compositing on mid-range Android / low-memory devices
 const URL_LIVE = 'https://maximusdigitals.github.io/marlowe/';
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 const rnd = (a, b) => a + Math.random() * (b - a);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const root = document.documentElement;
-history.scrollRestoration = 'manual';
+root.classList.toggle('ios', IOS); root.classList.toggle('inx', IN_X); root.classList.toggle('webview', WEBVIEW); root.classList.toggle('lite', LITE);
+try { history.scrollRestoration = 'manual'; } catch (e) {}
 scrollTo(0, 0);
+// webp everywhere X runs today; jpg twins exist for anything that can't decode it
+let EXT = '.webp';
+const img = n => 'img/' + n + EXT;
+(() => { const t = new Image(); t.onerror = () => { EXT = '.jpg'; root.classList.add('nowebp'); document.querySelectorAll('img').forEach(i => { const a = i.getAttribute('src'); if (a && /\.webp$/.test(a)) i.src = a.replace(/\.webp$/, '.jpg'); }); document.querySelectorAll('[data-img]').forEach(e => e.dataset.img = e.dataset.img.replace(/\.webp$/, '.jpg')); }; t.src = 'data:image/webp;base64,UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA=='; })();
+// house-light colours computed here, so nothing depends on CSS color-mix() (older Android WebViews lack it)
+const C0 = { paper: [236, 229, 216], night: [10, 9, 8], ink: [19, 17, 15], bone: [230, 222, 206], ox: [122, 23, 18], ox2: [179, 42, 32] };
+const mix = (a, b, k) => a.map((v, i) => Math.round(v + (b[i] - v) * k));
+const rgb = c => 'rgb(' + c.join(',') + ')';
+const themeMeta = document.querySelector('meta[name="theme-color"]');
+let lastT = -1;
+function paint(t) {
+  const q = Math.round(t * 100) / 100; if (q === lastT) return; lastT = q;
+  const bg = mix(C0.paper, C0.night, q), fg = mix(C0.ink, C0.bone, q);
+  root.style.setProperty('--bg', rgb(bg)); root.style.setProperty('--fg', rgb(fg));
+  root.style.setProperty('--mute', rgb(mix(fg, bg, 0.42))); root.style.setProperty('--rule', rgb(mix(fg, bg, 0.7)));
+  root.style.setProperty('--accent', rgb(mix(C0.ox, C0.ox2, q)));
+  if (themeMeta) themeMeta.setAttribute('content', rgb(bg));
+}
+paint(0);
 
 let d = 0, maxD = 0, started = false, scared = false, inCor = false;
 
@@ -46,9 +76,40 @@ setInterval(() => {
 
 /* ====================== AUDIO ====================== */
 const A = { on: false };
+// silent WAV (0.5 s, 8 kHz, 8-bit) for the iOS <audio> fallback
+function silentWav() {
+  const n = 4000, b = new Uint8Array(44 + n), v = new DataView(b.buffer), w = (o, str) => { for (let i = 0; i < str.length; i++) b[o + i] = str.charCodeAt(i); };
+  w(0, 'RIFF'); v.setUint32(4, 36 + n, true); w(8, 'WAVEfmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, 8000, true); v.setUint32(28, 8000, true); v.setUint16(32, 1, true); v.setUint16(34, 8, true); w(36, 'data'); v.setUint32(40, n, true);
+  b.fill(128, 44); return URL.createObjectURL(new Blob([b], { type: 'audio/wav' }));
+}
+// Must run synchronously inside the tap. Order matters on iOS WebKit / X's WKWebView.
+function unlockAudio() {
+  // iOS 17+: put Web Audio on the playback channel so the silent switch doesn't mute it
+  try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
+  audioInit(); const ac = A.ac; if (!ac) return;
+  try { const p = ac.resume && ac.resume(); if (p && p.catch) p.catch(() => {}); } catch (e) {}
+  try { const b = ac.createBuffer(1, 1, 22050), s = ac.createBufferSource(); s.buffer = b; s.connect(ac.destination); s.start(0); } catch (e) {}
+  // older iOS: a playing <audio playsinline> element moves the page to the media channel
+  if (IOS && !navigator.audioSession) {
+    try { const el = document.createElement('audio'); el.setAttribute('playsinline', ''); el.setAttribute('webkit-playsinline', ''); el.setAttribute('x-webkit-airplay', 'deny'); el.loop = true; el.preload = 'auto'; el.src = silentWav(); const p = el.play(); if (p && p.catch) p.catch(() => {}); A.silent = el; } catch (e) {}
+  }
+  try { ac.onstatechange = sndState; } catch (e) {}
+  setTimeout(sndState, 900);
+}
+// resume whenever iOS 'interrupted' us (call, Siri, app switch) or Android suspended us
+function kick() {
+  if (!A.on) return;
+  try { if (A.ac.state !== 'running' && A.ac.state !== 'closed') { const p = A.ac.resume(); if (p && p.then) p.then(sndState, () => {}); } } catch (e) {}
+  try { if (A.silent && A.silent.paused) { const p = A.silent.play(); if (p && p.catch) p.catch(() => {}); } } catch (e) {}
+}
+function sndState() { const b = document.getElementById('snd'); if (!b || !A.on) return; b.hidden = !(started && !scared && A.ac.state !== 'running'); }
+['touchend', 'pointerup', 'click', 'keydown'].forEach(ev => addEventListener(ev, kick, { passive: true, capture: true }));
+addEventListener('pageshow', kick); addEventListener('focus', kick);
 function audioInit() {
   const C = window.AudioContext || window.webkitAudioContext; if (!C) return;
-  const ac = new C(); A.ac = ac; A.on = true;
+  let ac; try { ac = new C({ latencyHint: 'interactive' }); } catch (e) { ac = new C(); }
+  A.ac = ac; A.on = true;
   const comp = ac.createDynamicsCompressor(); comp.threshold.value = -10; comp.ratio.value = 6; comp.connect(ac.destination);
   const master = ac.createGain(); master.gain.value = 0.9; master.connect(comp); A.master = master;
   const dl = ac.createDelay(1); dl.delayTime.value = 0.23; const fb = ac.createGain(); fb.gain.value = 0.38;
@@ -168,27 +229,36 @@ function sting(level = 1) {
 /* ====================== GATE ====================== */
 function start(sound) {
   if (started) return; started = true;
-  if (sound) { try { audioInit(); } catch (e) {} }
+  if (sound) { try { unlockAudio(); } catch (e) {} }
+  scrollTo(0, 0);
   $('#gate').classList.add('out'); document.body.classList.remove('locked'); document.body.classList.add('started');
   setTimeout(() => $('#gate').remove(), 1200);
   if (A.on) { const n = A.ac.currentTime; A.pad.gain.setTargetAtTime(0.22, n, 1.2); A.hum.gain.setTargetAtTime(0.05, n, 1.5); A.clat.gain.setTargetAtTime(0.035, n, 1.5); }
   noticeText(); requestAnimationFrame(loop);
 }
 // fit the gate wordmark to the full width
-function fitWord() { const w = $('.g-word'); if (!w) return; w.style.fontSize = '100px'; const r = w.getBoundingClientRect().width; const target = $('#gate').clientWidth - 2 * parseFloat(getComputedStyle($('#gate')).paddingLeft); w.style.fontSize = Math.min(100 * target / r * 0.995, innerHeight * 0.46) + "px"; }
+function fitWord() { const w = $('.g-word'); if (!w) return; w.style.fontSize = '100px'; const r = w.getBoundingClientRect().width; const target = $('#gate').clientWidth - 2 * parseFloat(getComputedStyle($('#gate')).paddingLeft); w.style.fontSize = Math.min(100 * target / r * 0.995, innerHeight * (innerHeight < 720 ? 0.34 : 0.46)) + "px"; }
 document.fonts && document.fonts.ready.then(fitWord); fitWord(); addEventListener('resize', fitWord);
 $('#enter').addEventListener('click', () => start(true));
 $('#enterQuiet').addEventListener('click', () => start(false));
+$('#snd').addEventListener('click', () => { kick(); setTimeout(sndState, 300); });
+(() => { const h = $('#hint'); if (!h) return; let t = '';
+  if (IOS) t = navigator.audioSession ? 'iPhone: volume up. Headphones if you dare.' : 'iPhone: flip the ringer switch on and turn the volume up.';
+  else if (PHONE) t = 'Volume up. Headphones if you dare.';
+  if (t) { h.textContent = t; h.hidden = false; } })();
 
 /* ====================== GRAIN ====================== */
-const gc = $('#grain'), gx = gc.getContext('2d'); gc.width = 200; gc.height = 120;
-const gimg = gx.createImageData(200, 120); let gt = 0;
-function grain(ts) { if (ts - gt > (RM ? 1e9 : 80)) { gt = ts; const p = gimg.data; for (let i = 0; i < p.length; i += 4) { const v = Math.random() * 255; p[i] = p[i + 1] = p[i + 2] = v; p[i + 3] = 255; } gx.putImageData(gimg, 0, 0); } }
+const GW = LITE ? 128 : 200, GH = LITE ? 80 : 120, GSTEP = RM ? 1e9 : LITE ? 140 : PHONE ? 100 : 80;
+const gc = $('#grain'), gx = gc.getContext('2d', { alpha: false }) || gc.getContext('2d'); gc.width = GW; gc.height = GH;
+const gimg = gx.createImageData(GW, GH); let gt = 0;
+function grain(ts) { if (ts - gt > GSTEP) { gt = ts; const p = gimg.data; for (let i = 0; i < p.length; i += 4) { const v = Math.random() * 255; p[i] = p[i + 1] = p[i + 2] = v; p[i + 3] = 255; } gx.putImageData(gimg, 0, 0); } }
 
 /* ====================== DREAD ====================== */
 const secs = $$('[data-d]');
-let secY = []; const measure = () => { secY = secs.map(s => ({ y: s.getBoundingClientRect().top + scrollY, v: +s.dataset.d })); };
-addEventListener('resize', measure); addEventListener('load', measure); measure(); setInterval(measure, 2000);
+let secY = []; const measure0 = () => { secY = secs.map(s => ({ y: s.getBoundingClientRect().top + scrollY, v: +s.dataset.d })); };
+let trigY = 0;
+const measure = () => { measure0(); const t = $('#trigger'); trigY = t.getBoundingClientRect().top + scrollY; };
+addEventListener('resize', measure); addEventListener('load', measure); addEventListener('orientationchange', () => setTimeout(measure, 300)); measure(); setInterval(measure, 2000);
 function computeD() {
   const mid = scrollY + innerHeight * 0.5; let prev = { y: 0, v: 0 }, val = 0;
   for (const s of secY) { if (mid < s.y) { const span = s.y - prev.y || 1; val = prev.v + (s.v - prev.v) * clamp((mid - prev.y) / span); return clamp(val); } prev = s; val = s.v; }
@@ -202,11 +272,14 @@ const mqB = 'He returns — He returns — He returns — Please remain seated �
 MQ.textContent = mqA.repeat(4); let mqx = 0, mqMode = 0;
 
 /* ====================== LOOP ====================== */
-let lastBeat = 0, cx = innerWidth / 2, cy = innerHeight / 2, gxp = cx, gyp = cy;
+let lastDi = -1, lastBeat = 0, cx = innerWidth / 2, cy = innerHeight / 2, gxp = cx, gyp = cy;
 function loop(ts = 0) {
   if (!scared) {
     const nd = computeD();
-    if (Math.abs(nd - d) > 0.002) { d = nd; root.style.setProperty('--d', d.toFixed(3)); root.style.setProperty('--t', smooth(clamp((d - 0.15) / 0.33)).toFixed(3)); audioDread(); }
+    if (Math.abs(nd - d) > 0.004) { d = nd; root.style.setProperty('--d', d.toFixed(3)); const t = smooth(clamp((d - 0.15) / 0.33)); root.style.setProperty('--t', t.toFixed(3)); paint(t); const di = Math.round(d * 20) / 20; if (di !== lastDi) { lastDi = di; root.style.setProperty('--di', di); } audioDread(); }
+    if (d > 0.8) warmScare();
+    // scroll-position fallback for the trigger (momentum flings can skip an IntersectionObserver tick)
+    if (trigY && scrollY + innerHeight > trigY + 2) { scare(); }
     if (d > maxD) maxD = d;
     const cor = $('#corridor').getBoundingClientRect();
     const nowCor = cor.top < innerHeight * 0.35 && cor.bottom > 0;
@@ -307,7 +380,7 @@ addEventListener('touchstart', e => { const t = e.touches[0]; px = t.clientX; py
 addEventListener('touchmove', e => { const t = e.touches[0]; px = t.clientX; py = t.clientY; lastMove = performance.now(); }, { passive: true });
 // programme rows: floating poster follows the cursor (desktop)
 $$('.film').forEach(f => {
-  f.addEventListener('pointerenter', e => { if (!FINE) return; prevImg.src = f.id === 'g1' && maxD > 0.72 ? 'img/giggles3.webp' : f.dataset.img; prev.style.left = e.clientX + 'px'; prev.style.top = e.clientY + 'px'; prev.classList.add('on'); cur.classList.add('big'); });
+  f.addEventListener('pointerenter', e => { if (!FINE) return; prevImg.src = f.id === 'g1' && maxD > 0.72 ? img('giggles3') : f.dataset.img; prev.style.left = e.clientX + 'px'; prev.style.top = e.clientY + 'px'; prev.classList.add('on'); cur.classList.add('big'); });
   f.addEventListener('pointerleave', () => { prev.classList.remove('on'); cur.classList.remove('big'); });
 });
 
@@ -321,15 +394,15 @@ function tiltPoster() {
 addEventListener('scroll', () => { if (FINE || RM) return; const el = $('#g2'); const r = el.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return; el.style.transform = `perspective(900px) rotateX(${(innerHeight / 2 - (r.top + r.height / 2)) / innerHeight * 22}deg)`; }, { passive: true });
 let g1seen = 0, g1done = false;
 new IntersectionObserver(es => es.forEach(e => {
-  if (e.isIntersecting && !g1done) g1seen = setTimeout(() => { g1done = true; g1.src = 'img/giggles2.webp'; if (A.on) noiseHit(0.2, 0.06, 900, 1); setTimeout(() => g1.src = 'img/giggles1.webp', 180); }, 3200);
+  if (e.isIntersecting && !g1done) g1seen = setTimeout(() => { g1done = true; g1.src = img('giggles2'); if (A.on) noiseHit(0.2, 0.06, 900, 1); setTimeout(() => g1.src = img('giggles1'), 180); }, 3200);
   else clearTimeout(g1seen);
 }), { threshold: 0.6 }).observe($('#g1'));
 let g2stage = 0;
 new IntersectionObserver(es => es.forEach(e => {
   if (e.isIntersecting) { if (g2stage === 0) { g2stage = 1; setTimeout(() => $('.whisper').classList.add('show'), 2500); } }
-  else if (g2stage === 1 && maxD > 0.66) { g2stage = 2; g2.src = 'img/giggles3.webp'; $('#g2tag').textContent = 'Last showing'; }
+  else if (g2stage === 1 && maxD > 0.66) { g2stage = 2; g2.src = img('giggles3'); $('#g2tag').textContent = 'Last showing'; }
 }), { threshold: 0.3 }).observe($('#g2'));
-setInterval(() => { if (maxD > 0.72) { g1.src = 'img/giggles3.webp'; const s = $('#g1 .soon'); if (s) s.textContent = 'now showing'; } }, 1000);
+setInterval(() => { if (maxD > 0.72) { g1.src = img('giggles3'); const s = $('#g1 .soon'); if (s) s.textContent = 'now showing'; } }, 1000);
 
 /* ====================== HE APPEARS IN THE ROOMS ====================== */
 const heIO = new IntersectionObserver(es => es.forEach(e => {
@@ -432,10 +505,25 @@ function flashlight(ts) {
 
 /* ====================== THE SCARE ====================== */
 new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && !scared) scare(); }), { threshold: 0 }).observe($('#trigger'));
+addEventListener('scroll', () => { if (started && !scared && trigY && scrollY + innerHeight > trigY + 2) scare(); }, { passive: true });
+// decode the two faces long before they're needed, so the hit never shows a blank frame
+let warmed = false;
+function warmScare() {
+  if (warmed) return; warmed = true;
+  const sc = $('#scare');
+  $$('img', sc).forEach(i => { try { i.loading = 'eager'; i.decoding = 'sync'; } catch (e) {} });
+  [img('clown'), img('clown-close'), img('corridor'), img('corridor-he')].forEach(src => { const i = new Image(); i.src = src; if (i.decode) i.decode().catch(() => {}); });
+  sc.classList.add('warm');
+  $$('img', sc).forEach(i => { if (i.decode) i.decode().catch(() => {}); });
+}
+const noTouch = e => { if (e.cancelable && !e.target.closest('#end')) e.preventDefault(); };
 let reloadHit = null;
 $('#reload').addEventListener('click', () => reloadHit && reloadHit());
 async function scare() {
-  scared = true; root.classList.add('noscroll');
+  if (scared || !started) return;
+  scared = true; root.classList.add('noscroll'); warmScare(); kick(); sndState();
+  // iOS WebKit ignores overflow:hidden for touch scrolling, so stop momentum by hand
+  try { addEventListener('touchmove', noTouch, { passive: false }); } catch (e) {}
   ghost.classList.remove('on');
   if (A.on) { const n = A.ac.currentTime; [A.pad, A.hum, A.clat, A.drone, A.wind].forEach(g => { g.gain.cancelScheduledValues(n); g.gain.setTargetAtTime(0, n, 0.05); }); }
   // the light dies
@@ -452,9 +540,9 @@ async function scare() {
   await sleep(850);
   // HIT ONE
   off.classList.remove('on');
-  const sc = $('#scare'); if (innerHeight > innerWidth) { sc.classList.add('portrait'); sc.querySelector('.s2').src = 'img/clown.webp'; } sc.classList.add('go'); sting(1);
+  const sc = $('#scare'); if (innerHeight > innerWidth) { sc.classList.add('portrait'); sc.querySelector('.s2').src = img('clown'); } sc.classList.add('go'); sting(1);
   if (!RM) { sc.classList.add('shake'); const f = $('#flash'); f.style.transition = 'none'; f.style.opacity = '.55'; requestAnimationFrame(() => { f.style.transition = 'opacity .45s'; f.style.opacity = '0'; }); }
-  if (navigator.vibrate) try { navigator.vibrate([300, 60, 200, 60, 500]); } catch (e) {}
+  if (navigator.vibrate && !RM) try { navigator.vibrate([300, 60, 200, 60, 500]); } catch (e) {}
   await sleep(620);
   // HIT TWO: closer
   sc.classList.add('two'); sting(1.6);
@@ -470,16 +558,29 @@ async function scare() {
 /* ====================== END ====================== */
 const shareText = "tried to book a private cinema for date night. the website had other plans (sound on)";
 $('#share').href = 'https://x.com/intent/post?text=' + encodeURIComponent(shareText) + '&url=' + encodeURIComponent(URL_LIVE);
+if (PHONE || WEBVIEW) $$('a[target="_blank"]').forEach(a => a.removeAttribute('target'));
 $('#replay').addEventListener('click', () => { scrollTo(0, 0); location.reload(); });
 
 /* ====================== TAB TITLE / FAVICON ====================== */
 const fav = $('#favicon'), favOrig = fav.href;
 const favEye = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23000'/%3E%3Cellipse cx='16' cy='16' rx='12' ry='7' fill='%23e8dccb'/%3E%3Ccircle cx='16' cy='16' r='4.5' fill='%237a1712'/%3E%3Ccircle cx='16' cy='16' r='1.6' fill='%23000'/%3E%3C/svg%3E";
+let hiddenAt = 0;
+function cameBack() {
+  if (!started || scared || maxD < 0.25) return;
+  const el = $('#seated'), old = el.textContent;
+  el.textContent = maxD > 0.6 ? 'He kept your seat warm' : 'You left. He didn\u2019t.'; el.classList.add('on');
+  if (A.on) { whisper(-1, 1, 6, 0.2); blip('sine', 55, 1.2, 0.4, 0, 30); }
+  setTimeout(() => { el.classList.remove('on'); setTimeout(() => el.textContent = old, 300); }, 2200);
+}
+addEventListener('pagehide', () => { hiddenAt = performance.now(); });
+addEventListener('pageshow', e => { if (e.persisted) cameBack(); });
 document.addEventListener('visibilitychange', () => {
+  if (document.hidden) hiddenAt = performance.now();
+  else { kick(); if (hiddenAt && performance.now() - hiddenAt > 1200) cameBack(); }
   if (scared) return;
   if (document.hidden && maxD > 0.25) { document.title = maxD > 0.6 ? 'he is in your seat' : 'come back'; fav.href = favEye; }
   else { document.title = maxD > 0.6 ? 'Marlowe — he saved your seat' : 'Marlowe — Private Cinema'; fav.href = maxD > 0.6 ? favEye : favOrig; if (!document.hidden && maxD > 0.25 && A.on) whisper(-0.2, 0.2, 4, 0.18); }
 });
 
-window.__marlowe = { get d() { return d; } };
+window.__marlowe = { get d() { return d; }, build: 'v3-x-inapp', env: { IOS, ANDROID, IN_X, WEBVIEW, LOW, LITE, PHONE }, get audio() { return A.on ? A.ac.state : 'off'; }, get warmed() { return warmed; } };
 })();

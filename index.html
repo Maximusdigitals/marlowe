@@ -9,12 +9,26 @@
 <meta property="og:title" content="Marlowe — Private Cinema">
 <meta property="og:description" content="Twelve seats. One screen. Nobody else. Book your private screening.">
 <meta property="og:image" content="https://maximusdigitals.github.io/marlowe/img/og.jpg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Marlowe Private Cinema">
+<meta property="og:url" content="https://maximusdigitals.github.io/marlowe/">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Marlowe Private Cinema — admit one ticket">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Marlowe — Private Cinema">
+<meta name="twitter:description" content="Twelve seats. One screen. Nobody else. Book your private screening.">
+<meta name="twitter:image" content="https://maximusdigitals.github.io/marlowe/img/og.jpg">
+<meta name="twitter:image:alt" content="Marlowe Private Cinema — admit one ticket">
+<meta name="twitter:creator" content="@voidhl">
+<meta name="format-detection" content="telephone=no">
+<meta name="marlowe-build" content="v3-x-inapp">
+<link rel="canonical" href="https://maximusdigitals.github.io/marlowe/">
 <link rel="icon" id="favicon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23ece5d8'/%3E%3Ctext x='16' y='26' font-size='26' text-anchor='middle' font-family='serif' fill='%2313110f'%3EM%3C/text%3E%3C/svg%3E">
 <link rel="preload" href="fonts/LeMurmure-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/Newsreader.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/Compagnon-Roman.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=3">
 </head>
 <body class="locked">
 
@@ -31,6 +45,7 @@
     </div>
     <div class="t-stub" aria-hidden="true"><span class="lab">Nº</span><b class="disp">0001</b><span class="lab">Row C<br>Seat 5</span></div>
   </div>
+  <p class="g-hint lab" id="hint" hidden></p>
   <p class="g-note lab">Content note: contains a jump scare and horror imagery. No flashing lights. Headphones make it worse.</p>
 </div>
 
@@ -43,6 +58,7 @@
 <div id="preview" aria-hidden="true"><img alt=""></div>
 <div id="cur" aria-hidden="true"></div><div id="ghost" aria-hidden="true"></div>
 <div id="seated" class="disp" aria-hidden="true">Please remain seated</div>
+<button id="snd" class="lab" hidden>Tap for sound</button>
 
 <header id="bar">
   <a class="wm disp" href="#top">Marlowe</a>
@@ -241,7 +257,7 @@
 <!-- ================= CORRIDOR ================= -->
 <section id="corridor" class="sec" data-d="0.97">
   <div class="dark-room">
-    <div class="cor-stick"><img src="img/corridor.webp" alt="" class="cor-img"><img src="img/corridor-he.webp" alt="" class="cor-img he2"></div>
+    <div class="cor-stick"><img src="img/corridor.webp" alt="" class="cor-img" loading="lazy" decoding="async"><img src="img/corridor-he.webp" alt="" class="cor-img he2" loading="lazy" decoding="async"></div>
     <div class="cor-text t1">Your screening room is at the end of the hall.</div>
     <div class="cor-text t2">Follow the light.</div>
     <figure class="cor-poster" id="g3"><img src="img/giggles4.webp" alt="" loading="lazy"><figcaption class="lab">Giggles — now showing</figcaption></figure>
@@ -279,11 +295,11 @@
       <div class="t-stub"><span class="lab">Nº</span><b class="disp">0002</b><span class="lab">Used</span></div>
       <span class="stamp disp">Admitted</span>
     </div>
-    <div class="cta"><a id="share" class="btn" target="_blank" rel="noopener">Share your screening on X</a><button id="replay" class="link lab">Watch again</button></div>
+    <div class="cta"><a id="share" class="btn" href="https://x.com/intent/post" target="_blank" rel="noopener">Share your screening on X</a><button id="replay" class="link lab">Watch again</button></div>
     <p class="lab fine">Marlowe is fictional. No real cinema, clown or projectionist was harmed. Made by <a href="https://x.com/voidhl" target="_blank" rel="noopener">@voidhl</a>.</p>
   </div>
 </div>
 
-<script src="app.js"></script>
+<script src="app.js?v=3"></script>
 </body>
 </html>
