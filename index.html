@@ -4,199 +4,247 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Marlowe — Private Cinema</title>
-<meta name="description" content="Marlowe Private Cinema. Twelve velvet seats, a 7.3m screen, Dolby Atmos. Your film, your guests, nobody else.">
-<meta name="theme-color" content="#0d0a08">
+<meta name="description" content="Marlowe Private Cinema. Twelve velvet seats, a 7.3 m screen, Dolby Atmos. Your film, your guests, nobody else.">
+<meta name="theme-color" content="#ece5d8">
 <meta property="og:title" content="Marlowe — Private Cinema">
 <meta property="og:description" content="Twelve seats. One screen. Nobody else. Book your private screening.">
 <meta property="og:image" content="https://maximusdigitals.github.io/marlowe/img/og.jpg">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="preload" href="fonts/cormorant.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="img/clown.webp" as="image">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect x=%2215%22 y=%2215%22 width=%2270%22 height=%2270%22 transform=%22rotate(45 50 50)%22 fill=%22%230d0a08%22 stroke=%22%23c9a45c%22 stroke-width=%225%22/%3E%3Ctext x=%2250%22 y=%2265%22 font-size=%2244%22 text-anchor=%22middle%22 fill=%22%23e6cf98%22 font-family=%22serif%22%3EM%3C/text%3E%3C/svg%3E">
+<link rel="icon" id="favicon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23ece5d8'/%3E%3Ctext x='16' y='26' font-size='26' text-anchor='middle' font-family='serif' fill='%2313110f'%3EM%3C/text%3E%3C/svg%3E">
+<link rel="preload" href="fonts/LeMurmure-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/Newsreader.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/Compagnon-Roman.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="style.css">
 </head>
 <body class="locked">
 
-<!-- ============ GATE ============ -->
+<!-- ================= GATE ================= -->
 <div id="gate" role="dialog" aria-label="Enter Marlowe">
-  <div class="gate-inner">
-    <div class="mark">M</div>
-    <p class="eyebrow">Marlowe · Private Cinema · Est. 1926</p>
-    <h1 class="gate-title">An evening<br><em>made for you alone.</em></h1>
-    <button id="enter" class="btn gold">Enter the theater</button>
-    <button id="enterQuiet" class="btn ghost small">Enter without sound</button>
-    <p class="gate-note">🎧 Sound on recommended.<br><span>Content note: this site contains a jump scare and horror imagery. No flashing lights.</span></p>
+  <div class="g-top lab"><span>Marlowe Private Cinema</span><span class="hide-s">No. 9 Ashby Mews</span><span>Est. 1926</span></div>
+  <h1 class="disp g-word" aria-label="Marlowe">Marlowe</h1>
+  <div class="ticket g-ticket">
+    <div class="t-main">
+      <p class="lab">Admit one &nbsp;/&nbsp; Private screening</p>
+      <p class="t-line"><em>An evening made for you alone.</em></p>
+      <button id="enter" class="btn">Enter the theatre, sound on</button>
+      <button id="enterQuiet" class="link lab">Or enter without sound</button>
+    </div>
+    <div class="t-stub" aria-hidden="true"><span class="lab">Nº</span><b class="disp">0001</b><span class="lab">Row C<br>Seat 5</span></div>
   </div>
+  <p class="g-note lab">Content note: contains a jump scare and horror imagery. No flashing lights. Headphones make it worse.</p>
 </div>
 
-<!-- persistent layers -->
 <canvas id="grain" aria-hidden="true"></canvas>
 <div id="vignette" aria-hidden="true"></div>
 <div id="shadows" aria-hidden="true"></div>
 <div id="flash" aria-hidden="true"></div>
 <div id="dim" aria-hidden="true"></div>
+<div id="sub" aria-hidden="true"><img src="img/clown-close.webp" alt=""></div>
+<div id="preview" aria-hidden="true"><img alt=""></div>
+<div id="cur" aria-hidden="true"></div><div id="ghost" aria-hidden="true"></div>
+<div id="seated" class="disp" aria-hidden="true">Please remain seated</div>
 
-<header id="nav">
-  <a class="logo" href="#top"><span class="mark sm">M</span>MARLOWE</a>
-  <nav><a href="#rooms">The Rooms</a><a href="#packages">Packages</a><a href="#faq">FAQ</a></nav>
-  <a class="btn gold small" href="#book">Book</a>
+<header id="bar">
+  <a class="wm disp" href="#top">Marlowe</a>
+  <nav class="lab"><a href="#programme">Programme</a><a href="#rooms">The House</a><a href="#hire">Private hire</a><a href="#faq">Notes</a></nav>
+  <span class="lab clock" id="clock">--:--:--</span>
+  <a class="btn sm" href="#book">Book</a>
 </header>
 
 <main id="top">
 
-<!-- ============ HERO ============ -->
+<!-- ================= HERO ================= -->
 <section id="hero" class="sec" data-d="0">
-  <div class="hero-bg"><img src="img/hero.webp" alt="Marlowe auditorium with velvet seats" fetchpriority="high"><img class="hero-dark" src="img/hero-dark.webp" alt=""></div>
-  <div class="hero-copy">
-    <p class="eyebrow">Private Cinema · Members & Guests</p>
-    <h1>The finest seat in the city<br><em>is yours alone.</em></h1>
-    <p class="lede">Twelve hand-stitched velvet recliners. A 7.3-metre screen. Sound you feel in your chest. Hire the entire Marlowe for birthdays, proposals, premieres, or a quiet night with <span class="swap" data-to="whoever is already here">the people you love</span>.</p>
-    <div class="cta"><a class="btn gold" href="#book">Book a private screening</a><a class="btn ghost" href="#rooms">Tour the rooms</a></div>
+  <div class="meta lab"><span>Nº 01</span><span>Private hire · Twelve seats</span><span class="hide-s">Season 26/27</span></div>
+  <h1 class="disp h-title"><span class="l1">The finest</span><span class="l2">seat in</span><span class="l3">the city</span></h1>
+  <figure class="h-img">
+    <img src="img/hero.webp" alt="The Marlowe auditorium" fetchpriority="high">
+    <img class="alt" src="img/hero-dark.webp" alt="">
+    <figcaption class="lab">Fig. 1 — The Auditorium, looking north. Rows B &amp; C.</figcaption>
+  </figure>
+  <div class="h-copy">
+    <p class="h-lede"><em>is yours alone.</em></p>
+    <p>Twelve hand-stitched velvet recliners. A 7.3 m screen. Sound you feel in your chest. Hire the entire Marlowe for birthdays, proposals, premieres, or a quiet night with <span class="swap" data-at=".55" data-to="whoever is already here">the people you love</span>.</p>
+    <div class="cta"><a class="btn" href="#book">Book a private screening</a><a class="link lab" href="#rooms">Tour the house &rarr;</a></div>
   </div>
-  <ul class="stats">
-    <li><b>12</b><span>Velvet seats</span></li>
-    <li><b>7.3m</b><span>Screen width</span></li>
-    <li><b>4K</b><span>RGB laser</span></li>
-    <li><b>9.1.4</b><span>Dolby Atmos</span></li>
-  </ul>
+  <dl class="rider-mini">
+    <div><dt class="lab">Seats</dt><dd class="disp">12</dd></div>
+    <div><dt class="lab">Screen</dt><dd class="disp">7.3 m</dd></div>
+    <div><dt class="lab">Projection</dt><dd class="disp">4K Laser</dd></div>
+    <div><dt class="lab">Sound</dt><dd class="disp">9.1.4</dd></div>
+  </dl>
 </section>
 
-<!-- ============ NOW SHOWING ============ -->
-<section id="showing" class="sec" data-d="0.04">
-  <div class="sec-head"><p class="eyebrow">This season at the Marlowe</p><h2>Now showing</h2><p class="sub">Choose from our curated programme, or bring your own film in any format.</p></div>
-  <div class="posters">
-    <figure class="poster"><img src="img/poster-moon.webp" alt="" loading="lazy"><figcaption><b>Midnight on the Roof</b><span>1954 · Romance · Restored 4K</span></figcaption></figure>
-    <figure class="poster"><img src="img/poster-light.webp" alt="" loading="lazy"><figcaption><b>The Keeper's Light</b><span>1961 · Mystery · 35mm</span></figcaption></figure>
-    <figure class="poster giggles" id="g1"><span class="ribbon">Coming soon</span><img src="img/giggles1.webp" alt="" loading="lazy"><figcaption><b>Giggles</b><span>1926 · Family · Silent, live organ</span></figcaption></figure>
-  </div>
+<div class="marquee" aria-hidden="true"><div class="mq disp" id="mq"></div></div>
+
+<!-- ================= PROGRAMME ================= -->
+<section id="programme" class="sec" data-d="0.05">
+  <div class="s-head"><span class="lab">Nº 02 — The Programme</span><h2 class="disp">Now showing</h2><p class="s-sub">Choose from our season, or bring your own film in any format. Every title is projected for your party alone.</p></div>
+  <ol class="prog">
+    <li class="film" data-img="img/poster-moon.webp"><span class="lab n">01</span><span class="disp ft">Midnight on the Roof</span><span class="lab fm">1954 · Romance · Restored 4K</span><img src="img/poster-moon.webp" alt="" loading="lazy"></li>
+    <li class="film" data-img="img/poster-light.webp"><span class="lab n">02</span><span class="disp ft">The Keeper's Light</span><span class="lab fm">1961 · Mystery · 35 mm print</span><img src="img/poster-light.webp" alt="" loading="lazy"></li>
+    <li class="film giggles" id="g1" data-img="img/giggles1.webp"><span class="lab n">03</span><span class="disp ft">Giggles</span><span class="lab fm">1926 · Family · Silent, live organ — <i class="soon">coming soon</i></span><img src="img/giggles1.webp" alt="" loading="lazy"></li>
+  </ol>
 </section>
 
-<!-- ============ SPECS ============ -->
+<!-- ================= RIDER ================= -->
 <section id="specs" class="sec" data-d="0.1">
-  <div class="sec-head"><p class="eyebrow">The room</p><h2>Built for the film.<br><em>Not the crowd.</em></h2></div>
-  <div class="spec-grid">
-    <div class="spec"><i>01</i><h3>Screen</h3><p>7.3m acoustically transparent, 2.39:1 masking. Every seat sits inside the reference viewing angle.</p></div>
-    <div class="spec"><i>02</i><h3>Image</h3><p>4K RGB laser projection, 120fps, HDR. Plus a restored 35mm carbon-arc projector for the purists.</p></div>
-    <div class="spec"><i>03</i><h3>Sound</h3><p>Dolby Atmos 9.1.4 across 22 speakers. So precise you can hear <span class="swap" data-to="someone breathing behind you">a pin drop in row C</span>.</p></div>
-    <div class="spec"><i>04</i><h3>Seating</h3><p>Twelve power recliners in Italian mohair velvet, heated, with private side tables and call buttons.</p></div>
-    <div class="spec"><i>05</i><h3>Isolation</h3><p>Room-within-a-room build, NC-15 rating. <span class="swap" data-to="Nobody outside will hear a thing.">Total silence from the street.</span></p></div>
-    <div class="spec exits"><i>06</i><h3>Safety</h3><p>Emergency exits: <b id="exitCount">2</b>. Staffed by our front of house team from arrival until the very last guest leaves.</p></div>
-  </div>
+  <div class="s-head split"><span class="lab">Nº 03 — Technical rider</span><h2 class="disp">Built for the film.</h2><p class="s-sub"><em>Not for the crowd.</em></p></div>
+  <dl class="rider">
+    <div><dt class="lab">Screen</dt><dd>7.3 m acoustically transparent, 2.39:1 masking. Every seat sits inside the reference viewing angle.</dd></div>
+    <div><dt class="lab">Projection</dt><dd>4K RGB laser, 120 fps, HDR. A restored 35 mm carbon-arc projector for the purists.</dd></div>
+    <div><dt class="lab">Sound</dt><dd>Dolby Atmos 9.1.4 across 22 speakers. So precise you can hear <span class="swap" data-to="someone breathing behind you">a pin drop in row C</span>.</dd></div>
+    <div><dt class="lab">Seating</dt><dd>Twelve power recliners in Italian mohair velvet. Heated. Private side tables and call buttons.</dd></div>
+    <div><dt class="lab">Isolation</dt><dd>Room-within-a-room, NC-15. <span class="swap" data-to="Nobody outside will hear a thing.">Total silence from the street.</span></dd></div>
+    <div class="exits"><dt class="lab">Exits</dt><dd><b id="exitCount" class="disp">2</b> &nbsp;Staffed by front of house from arrival until the very last guest leaves.</dd></div>
+  </dl>
 </section>
 
-<!-- ============ ROOMS ============ -->
+<!-- ================= ROOMS ================= -->
 <section id="rooms" class="sec" data-d="0.16">
-  <div class="sec-head"><p class="eyebrow">Tour the Marlowe</p><h2>Six rooms.<br><em>One evening.</em></h2></div>
+  <div class="s-head"><span class="lab">Nº 04 — The House</span><h2 class="disp">Six rooms. One evening.</h2><p class="s-sub">At this point we ask guests to let their eyes adjust. <span class="lab">House lights down.</span></p></div>
 
-  <article class="room" data-d="0.18">
-    <div class="room-img"><img src="img/hero.webp" alt="The auditorium" loading="lazy"></div>
-    <div class="room-copy"><i>I</i><h3>The Auditorium</h3><p>A star-field ceiling of 1,400 fibre-optic points, walnut panelling, and twelve seats with perfect sightlines from every one.</p><p class="fine">Capacity 12 · <span class="swap" data-to="Currently 13">Currently 0</span></p></div>
+  <article class="room r1" data-d="0.18">
+    <figure><img src="img/hero.webp" alt="The auditorium" loading="lazy"><figcaption class="lab">Fig. 2</figcaption></figure>
+    <div class="rc"><span class="lab">I</span><h3 class="disp">The Auditorium</h3><p>A star-field ceiling of 1,400 fibre-optic points, walnut panelling, and twelve seats with a perfect sightline from every one.</p><p class="lab fine">Capacity 12 · <span class="swap" data-to="Currently 13">Currently 0</span></p></div>
   </article>
 
-  <article class="room flip" data-d="0.24">
-    <div class="room-img"><img src="img/lounge.webp" alt="The Emerald Lounge" loading="lazy"></div>
-    <div class="room-copy"><i>II</i><h3>The Emerald Lounge</h3><p>Green marble, brass, and a vintage poster collection. Champagne on arrival, cocktails at the interval, and a bar that stays open <span class="swap" data-to="whether you want it to or not">as late as you like</span>.</p></div>
+  <article class="room r2" data-d="0.25">
+    <figure><img src="img/lounge.webp" alt="The Emerald Lounge" loading="lazy"><img class="he" src="img/lounge-he.webp" alt="" loading="lazy"><figcaption class="lab">Fig. 3</figcaption></figure>
+    <div class="rc"><span class="lab">II</span><h3 class="disp">The Emerald Lounge</h3><p>Green marble, brass and part of our poster collection. Champagne on arrival, cocktails at the interval, and a bar that stays open <span class="swap" data-to="whether you want it to or not">as late as you like</span>.</p><p class="lab fine late">Our bar staff are the only people in the lounge.</p></div>
   </article>
 
-  <article class="room" data-d="0.32">
-    <div class="room-img"><img src="img/booth.webp" alt="The projection booth" loading="lazy"></div>
-    <div class="room-copy"><i>III</i><h3>The Projection Booth</h3><p>Where laser meets carbon arc. Our projectionist has been with the Marlowe since opening night in 1926. <span class="swap" data-to="He has never left the booth.">He knows every reel by heart.</span></p></div>
+  <article class="room r3" data-d="0.33">
+    <figure><img src="img/booth.webp" alt="The projection booth" loading="lazy"><img class="he" src="img/booth-he.webp" alt="" loading="lazy"><figcaption class="lab">Fig. 4</figcaption></figure>
+    <div class="rc"><span class="lab">III</span><h3 class="disp">The Projection Booth</h3><p>Where laser meets carbon arc. Our projectionist has been with the Marlowe since opening night in 1926. <span class="swap" data-to="He has never left the booth.">He knows every reel by heart.</span></p></div>
   </article>
 
-  <article class="room flip" data-d="0.4">
-    <div class="room-img tall"><img src="img/corridor.webp" alt="The long corridor" loading="lazy"></div>
-    <div class="room-copy"><i>IV</i><h3>The Long Corridor</h3><p>Ninety feet of original velvet linking the lounge to the auditorium. The sconces are hand-blown glass from Murano. Guests often say they feel <span class="swap" data-to="followed">transported</span>.</p><p class="fine">Please don't run in the corridor. <span class="late">He doesn't like it when you run.</span></p></div>
+  <article class="room r4" data-d="0.41">
+    <figure class="tall"><img src="img/corridor.webp" alt="The long corridor" loading="lazy"><figcaption class="lab">Fig. 5</figcaption></figure>
+    <div class="rc"><span class="lab">IV</span><h3 class="disp">The Long Corridor</h3><p>Ninety feet of original velvet linking the lounge to the auditorium. The sconces are hand-blown Murano glass. Guests often say they feel <span class="swap" data-to="followed">transported</span>.</p><p class="lab fine">Please don't run in the corridor. <span class="late">He doesn't like it when you run.</span></p></div>
   </article>
 
-  <article class="room" data-d="0.48">
-    <div class="room-img"><img src="img/restroom.webp" alt="The powder room" loading="lazy"></div>
-    <div class="room-copy"><i>V</i><h3>The Powder Room</h3><p>Art deco tile and a gilded mirror original to the building. Recently refurbished. <span class="swap" data-to="Do not look at the mirror for too long.">Mostly.</span></p></div>
+  <article class="room r5" data-d="0.49">
+    <figure><img src="img/restroom.webp" alt="The powder room" loading="lazy"><img class="he" src="img/restroom-he.webp" alt="" loading="lazy"><figcaption class="lab">Fig. 6</figcaption></figure>
+    <div class="rc"><span class="lab">V</span><h3 class="disp">The Powder Room</h3><p>Art deco tile and a gilded mirror original to the building. Recently refurbished. <span class="swap" data-to="Don't look in the mirror for too long.">Mostly.</span></p></div>
   </article>
 
-  <article class="room flip" data-d="0.56">
-    <div class="room-img"><img src="img/archive.webp" alt="The archive" loading="lazy"></div>
-    <div class="room-copy"><i>VI</i><h3>The Archive</h3><p>Four thousand reels, including the only surviving print of <em>Giggles</em> (1926). Costumes from the original production are stored here. <span class="swap" data-to="Most of them.">All of them.</span></p><p class="fine redacted">Staff only. ████ ███ ████ ██ █████.</p></div>
+  <article class="room r6" data-d="0.56">
+    <figure><img src="img/archive.webp" alt="The archive" loading="lazy"><figcaption class="lab">Fig. 7</figcaption></figure>
+    <div class="rc"><span class="lab">VI</span><h3 class="disp">The Archive</h3><p>Four thousand reels, including the only surviving print of <em>Giggles</em> (1926). Costumes from the original production are kept here. <span class="swap" data-to="Most of them.">All of them.</span></p><p class="lab fine">Staff only. ████ ███ ████ ██ █████.</p></div>
   </article>
 </section>
 
-<!-- ============ GIGGLES RETURNS ============ -->
+<!-- ================= RETURNS ================= -->
 <section id="returns" class="sec" data-d="0.62">
-  <div class="returns-wrap">
-    <figure class="poster giggles big" id="g2"><span class="ribbon red">Back by demand</span><img src="img/giggles2.webp" alt="" loading="lazy"><figcaption><b>Giggles</b><span>1926 · Family · Silent</span></figcaption></figure>
-    <div class="returns-copy">
-      <p class="eyebrow">Members' favourite</p>
-      <h2>He's back by<br><em>popular demand.</em></h2>
+  <div class="ret">
+    <figure class="ret-poster" id="g2"><img src="img/giggles2.webp" alt="" loading="lazy"><figcaption class="lab"><span>Giggles</span><span id="g2tag">Back by demand</span></figcaption></figure>
+    <div class="ret-copy">
+      <span class="lab">Nº 05 — Members' favourite</span>
+      <h2 class="disp">He's back by popular demand.</h2>
       <p>Audiences loved <em>Giggles</em> so much that <span class="swap" data-to="none of them went home.">we brought it back for a third season.</span> Screened from the original nitrate print with live organ accompaniment.</p>
-      <p class="whisper">He's been asking about you.</p>
+      <p>Running time: <span class="swap" data-to="until you stop him">74 minutes</span>.</p>
+      <p class="whisper"><em>He's been asking about you.</em></p>
     </div>
   </div>
 </section>
 
-<!-- ============ SEATS ============ -->
-<section id="seats" class="sec" data-d="0.68">
-  <div class="sec-head"><p class="eyebrow">Choose your seat</p><h2>Every seat is<br><em>the best seat.</em></h2><p class="sub">Tap a seat to reserve it for your screening.</p></div>
-  <div class="screen-bar">SCREEN</div>
-  <div id="seatmap" class="seatmap" role="group" aria-label="Seat map"></div>
-  <p id="seatMsg" class="seat-msg">&nbsp;</p>
+<!-- ================= NOTICE (real time/device) ================= -->
+<section id="notice" class="sec" data-d="0.67">
+  <p class="lab">A note from front of house</p>
+  <p class="disp nt" id="ntTime">It's late.</p>
+  <p class="nt-body" id="ntBody">You should be somewhere else.</p>
 </section>
 
-<!-- ============ PACKAGES ============ -->
-<section id="packages" class="sec" data-d="0.74">
-  <div class="sec-head"><p class="eyebrow">Packages</p><h2>Stay as long<br><em>as you like.</em></h2></div>
-  <div class="pkgs">
-    <div class="pkg"><h3>The Matinee</h3><p class="price">$480<small> / 3 hrs</small></p><ul><li>Up to 12 guests</li><li>Popcorn & soft drinks bar</li><li>Any film from our programme</li></ul><a class="btn ghost small" href="#book">Reserve</a></div>
-    <div class="pkg feat"><span class="tag">Most popular</span><h3>The Premiere</h3><p class="price">$1,200<small> / evening</small></p><ul><li>Red carpet arrival & photographer</li><li>Champagne and a chef's tasting menu</li><li>Your film, any format</li><li><span class="swap" data-to="An extra guest. Uninvited.">A surprise guest appearance</span></li></ul><a class="btn gold small" href="#book">Reserve</a></div>
-    <div class="pkg cursed"><h3>The Final Act</h3><p class="price">Everything<small> / forever</small></p><ul><li>One guest. You.</li><li>No end time</li><li>Exits not included</li><li>He chooses the film</li></ul><a class="btn ghost small" href="#book">It's already reserved</a></div>
+<!-- ================= SEATS ================= -->
+<section id="seats" class="sec" data-d="0.71">
+  <div class="s-head"><span class="lab">Nº 06 — Choose your seat</span><h2 class="disp">Every seat is the best seat.</h2></div>
+  <div class="booking">
+    <div class="chart">
+      <div class="screen lab">Screen</div>
+      <div id="seatmap" class="seatmap" role="group" aria-label="Seat map"></div>
+      <div class="legend lab"><span><i class="k a"></i>Available</span><span><i class="k m"></i>Yours</span><span><i class="k t"></i>Taken</span></div>
+      <p id="seatMsg" class="seat-msg">Tap a seat to hold it.</p>
+    </div>
+    <aside class="stub-sum ticket">
+      <div class="t-main">
+        <p class="lab">Your screening</p>
+        <dl>
+          <div><dt class="lab">Film</dt><dd>Giggles (1926)</dd></div>
+          <div><dt class="lab">Date</dt><dd id="sumDate">Tonight</dd></div>
+          <div><dt class="lab">Doors</dt><dd id="sumTime">Now</dd></div>
+          <div><dt class="lab">Seat</dt><dd id="sumSeat">—</dd></div>
+          <div><dt class="lab">Party</dt><dd id="sumParty">1</dd></div>
+        </dl>
+      </div>
+    </aside>
   </div>
 </section>
 
-<!-- ============ TESTIMONIALS ============ -->
-<section id="reviews" class="sec" data-d="0.8">
-  <div class="sec-head"><p class="eyebrow">Guest notes</p><h2>What our guests<br><em>are saying.</em></h2></div>
-  <div class="revs">
-    <blockquote class="rev"><span class="stars">★★★★★</span><p>Booked the whole room for my wife's 40th. Flawless from the first glass of champagne to the last frame.</p><cite>Daniel R. · Anniversary</cite></blockquote>
-    <blockquote class="rev"><span class="stars">★★★★★</span><p>The Atmos is unreal. You can hear someone breathing in the seat behind you. We were the only two people booked.</p><cite>Priya K. · Date night</cite></blockquote>
-    <blockquote class="rev"><span class="stars">★★★★★</span><p>Kids loved the clown in the lobby. Staff said they don't have a clown. Kids still talk to him.</p><cite>Marcus T. · Birthday party</cite></blockquote>
-    <blockquote class="rev"><span class="stars">★★★★★</span><p>We stayed for the credits. We're still staying. The credits haven't ended.</p><cite>The Okafors · Party of 6</cite></blockquote>
-    <blockquote class="rev last"><span class="stars">★★★★★</span><p class="help">help us he is in the seats he is in the walls he is in the poster he is not in the poster</p><cite>— row C</cite></blockquote>
+<!-- ================= HIRE ================= -->
+<section id="hire" class="sec" data-d="0.77">
+  <div class="s-head"><span class="lab">Nº 07 — Private hire</span><h2 class="disp">Stay as long as you like.</h2></div>
+  <div class="menu">
+    <div class="row"><span class="lab n">A</span><h3 class="disp">The Matinee</h3><p>Three hours. Up to twelve guests. Popcorn and soft drinks bar. Any film from our programme.</p><span class="price disp">$480</span></div>
+    <div class="row feat"><span class="lab n">B</span><h3 class="disp">The Premiere <i class="lab tag">Most booked</i></h3><p>The full evening. Red carpet arrival and photographer, champagne and a chef's tasting menu, your film in any format, and <span class="swap" data-to="an extra guest. Uninvited.">a surprise guest appearance.</span></p><span class="price disp">$1,200</span></div>
+    <div class="row cursed"><span class="lab n">C</span><h3 class="disp">The Final Act</h3><p>One guest. You. No end time. Exits not included. He chooses the film.</p><span class="price disp">Everything</span></div>
   </div>
 </section>
 
-<!-- ============ FAQ ============ -->
-<section id="faq" class="sec" data-d="0.86">
-  <div class="sec-head"><p class="eyebrow">Before you arrive</p><h2>Questions</h2></div>
+<!-- ================= REVIEWS ================= -->
+<section id="notes" class="sec" data-d="0.83">
+  <div class="s-head"><span class="lab">Nº 08 — Guest book</span><h2 class="disp">What our guests are saying.</h2></div>
+  <div class="quotes">
+    <blockquote><p>“Booked the whole room for my wife's 40th. Flawless from the first glass of champagne to the last frame.”</p><cite class="lab">Daniel R. — Anniversary — 5/5</cite></blockquote>
+    <blockquote><p>“The Atmos is unreal. You can hear someone breathing in the seat behind you. We were the only two people booked.”</p><cite class="lab">Priya K. — Date night — 5/5</cite></blockquote>
+    <blockquote><p>“Kids loved the clown in the lobby. Staff said they don't have a clown. The kids still talk to him.”</p><cite class="lab">Marcus T. — Birthday party — 5/5</cite></blockquote>
+    <blockquote><p>“We stayed for the credits. We're still staying. The credits haven't ended.”</p><cite class="lab">The Okafors — Party of six — 5/5</cite></blockquote>
+    <blockquote class="broken"><p>help us he is in the seats he is in the walls he is in the poster he is not in the poster he is not in the poster</p><cite class="lab">— Row C</cite></blockquote>
+  </div>
+</section>
+
+<!-- ================= FAQ ================= -->
+<section id="faq" class="sec" data-d="0.88">
+  <div class="s-head"><span class="lab">Nº 09 — Before you arrive</span><h2 class="disp">Notes for guests</h2></div>
   <div class="faqs">
-    <details><summary>Can I bring my own film?</summary><p>Of course. DCP, Blu-ray, 35mm, or a file on a USB. Our projectionist will test it before you arrive.</p></details>
-    <details><summary>Is there parking?</summary><p>Complimentary valet. Your car will be waiting for you when you leave.</p></details>
-    <details><summary>What is your cancellation policy?</summary><p>Free cancellation up to 48 hours before. Once you have taken your seat, there is nothing left to cancel.</p></details>
-    <details><summary>Are children welcome?</summary><p>He loves children.</p></details>
-    <details><summary>Why is there no exit sign?</summary><p>You won't be needing one.</p></details>
-    <details><summary>Who is in seat C4?</summary><p class="redacted">██████ ██ ████ ████ ██ ████ █████ ███ ████. He has had that seat since 1926.</p></details>
+    <details><summary><span class="lab">9.1</span>Can I bring my own film?</summary><p>Of course. DCP, Blu-ray, 35 mm, or a file on a USB stick. Our projectionist will test it before you arrive.</p></details>
+    <details><summary><span class="lab">9.2</span>Is there parking?</summary><p>Complimentary valet. Your car will be waiting for you when you leave.</p></details>
+    <details><summary><span class="lab">9.3</span>What is your cancellation policy?</summary><p>Free cancellation up to 48 hours before. Once you have taken your seat, there is nothing left to cancel.</p></details>
+    <details><summary><span class="lab">9.4</span>Are children welcome?</summary><p>He loves children.</p></details>
+    <details><summary><span class="lab">9.5</span>Why is there no exit sign?</summary><p>You won't be needing one.</p></details>
+    <details><summary><span class="lab">9.6</span>Who sits in C4?</summary><p>██████ ██ ████ ████ ██ ████ █████. He has had that seat since 1926.</p></details>
   </div>
 </section>
 
-<!-- ============ BOOKING ============ -->
-<section id="book" class="sec" data-d="0.9">
-  <div class="sec-head"><p class="eyebrow">Reservations</p><h2>Book your<br><em>private screening.</em></h2><p class="sub">We'll take it from here.</p></div>
-  <form id="bookForm" class="book" autocomplete="off" onsubmit="return false">
-    <label>Name<input data-fill="you" readonly></label>
-    <label>Date<input data-fill="tonight. it was always tonight." readonly></label>
-    <label>Party size<input data-fill="1 + 1" readonly></label>
-    <label>Film<input data-fill="GIGGLES (1926)" readonly></label>
-    <label>Seat<input data-fill="C5 · beside him" readonly></label>
-    <label class="wide">Special requests<input data-fill="don't turn around" readonly></label>
-    <button id="confirm" class="btn gold wide" type="button">Confirm booking</button>
-    <p id="bookMsg" class="book-msg">&nbsp;</p>
+<!-- ================= BOOK ================= -->
+<section id="book" class="sec" data-d="0.92">
+  <div class="s-head"><span class="lab">Nº 10 — Reservations</span><h2 class="disp">Book your private screening.</h2><p class="s-sub">We'll take it from here.</p></div>
+  <form id="bookForm" class="ticket big" autocomplete="off" onsubmit="return false">
+    <div class="t-main">
+      <div class="bf">
+        <label><span class="lab">Name</span><input data-fill="you" readonly></label>
+        <label><span class="lab">Date</span><input id="fDate" data-fill="tonight" readonly></label>
+        <label><span class="lab">Doors</span><input id="fTime" data-fill="now" readonly></label>
+        <label><span class="lab">Party</span><input data-fill="1 + 1" readonly></label>
+        <label><span class="lab">Film</span><input data-fill="GIGGLES (1926)" readonly></label>
+        <label><span class="lab">Seat</span><input id="fSeat" data-fill="C5 · beside him" readonly></label>
+        <label class="wide"><span class="lab">Arriving on</span><input id="fDev" data-fill="the device in your hand" readonly></label>
+        <label class="wide"><span class="lab">Special requests</span><input data-fill="don't turn around" readonly></label>
+      </div>
+      <button id="confirm" class="btn" type="button">Confirm booking</button>
+      <p id="bookMsg" class="book-msg">&nbsp;</p>
+    </div>
+    <div class="t-stub" aria-hidden="true"><span class="lab">Admit</span><b class="disp">1+1</b><span class="lab">Nº 0001</span></div>
   </form>
 </section>
 
-<!-- ============ CORRIDOR ============ -->
-<section id="corridor" class="sec" data-d="0.96">
+<!-- ================= CORRIDOR ================= -->
+<section id="corridor" class="sec" data-d="0.97">
   <div class="dark-room">
-    <img src="img/corridor.webp" alt="" class="cor-img" loading="lazy">
+    <div class="cor-stick"><img src="img/corridor.webp" alt="" class="cor-img"><img src="img/corridor-he.webp" alt="" class="cor-img he2"></div>
     <div class="cor-text t1">Your screening room is at the end of the hall.</div>
     <div class="cor-text t2">Follow the light.</div>
-    <figure class="poster giggles empty" id="g3"><img src="img/giggles4.webp" alt="" loading="lazy"><figcaption><b>Giggles</b><span>Now showing</span></figcaption></figure>
+    <figure class="cor-poster" id="g3"><img src="img/giggles4.webp" alt="" loading="lazy"><figcaption class="lab">Giggles — now showing</figcaption></figure>
     <div class="cor-text t3">He's not in his poster.</div>
     <div class="cor-text t4">Your seat is ready.</div>
     <div id="trigger"></div>
@@ -204,23 +252,35 @@
   <div id="flashlight" aria-hidden="true"></div>
 </section>
 <div class="tail"></div>
-
 </main>
 
-<!-- ============ SCARE + END ============ -->
-<div id="scare" aria-hidden="true"><img src="img/clown.webp" alt=""></div>
+<!-- ================= FAKE OFFLINE ================= -->
+<div id="offline" aria-hidden="true">
+  <div class="off-in">
+    <svg viewBox="0 0 48 48" width="56" height="56" fill="none" stroke="#5f6368" stroke-width="2.4"><path d="M6 18c10-9 26-9 36 0M12 25c7-6 17-6 24 0M18 32c3.5-3 8.5-3 12 0"/><circle cx="24" cy="38" r="1.8" fill="#5f6368"/><path d="M8 8l32 32"/></svg>
+    <h4>No internet</h4>
+    <p>Try:</p>
+    <ul><li>Checking the network cables, modem and router</li><li>Reconnecting to Wi‑Fi</li></ul>
+    <p class="code" id="offCode">ERR_INTERNET_DISCONNECTED</p>
+    <button id="reload">Reload</button>
+  </div>
+</div>
 
+<!-- ================= SCARE ================= -->
+<div id="scare" aria-hidden="true"><img class="s1" src="img/clown.webp" alt=""><img class="s2" src="img/clown-close.webp" alt=""></div>
+
+<!-- ================= END ================= -->
 <div id="end" role="dialog" aria-label="Thank you">
-  <div class="end-inner">
-    <div class="mark">M</div>
-    <p class="eyebrow">Marlowe · Private Cinema</p>
-    <h2>Thank you for choosing<br><em>the Marlowe.</em></h2>
-    <p class="lede">You were a wonderful audience. Your seat will be kept warm.<br>Now taking private bookings for 2027.</p>
-    <div class="cta">
-      <a id="share" class="btn gold" target="_blank" rel="noopener">Share your screening on X</a>
-      <button id="replay" class="btn ghost">Watch again</button>
+  <div class="end-in">
+    <p class="lab">Marlowe Private Cinema — Est. 1926</p>
+    <h2 class="disp">Thank you for choosing the Marlowe.</h2>
+    <div class="ticket used">
+      <div class="t-main"><p class="lab">Admit one / Private screening</p><p class="t-line"><em>You were a wonderful audience.</em></p><p class="lab">Your seat will be kept warm. Now taking bookings for 2027.</p></div>
+      <div class="t-stub"><span class="lab">Nº</span><b class="disp">0002</b><span class="lab">Used</span></div>
+      <span class="stamp disp">Admitted</span>
     </div>
-    <p class="fine">Marlowe is fictional. No real cinema, clown or projectionist was harmed. · made by <a href="https://x.com/voidhl" target="_blank" rel="noopener">@voidhl</a></p>
+    <div class="cta"><a id="share" class="btn" target="_blank" rel="noopener">Share your screening on X</a><button id="replay" class="link lab">Watch again</button></div>
+    <p class="lab fine">Marlowe is fictional. No real cinema, clown or projectionist was harmed. Made by <a href="https://x.com/voidhl" target="_blank" rel="noopener">@voidhl</a>.</p>
   </div>
 </div>
 
