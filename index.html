@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Marlowe — Private Cinema</title>
+<meta name="description" content="Marlowe Private Cinema. Twelve velvet seats, a 7.3m screen, Dolby Atmos. Your film, your guests, nobody else.">
+<meta name="theme-color" content="#0d0a08">
+<meta property="og:title" content="Marlowe — Private Cinema">
+<meta property="og:description" content="Twelve seats. One screen. Nobody else. Book your private screening.">
+<meta property="og:image" content="https://maximusdigitals.github.io/marlowe/img/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="fonts/cormorant.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="img/clown.webp" as="image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect x=%2215%22 y=%2215%22 width=%2270%22 height=%2270%22 transform=%22rotate(45 50 50)%22 fill=%22%230d0a08%22 stroke=%22%23c9a45c%22 stroke-width=%225%22/%3E%3Ctext x=%2250%22 y=%2265%22 font-size=%2244%22 text-anchor=%22middle%22 fill=%22%23e6cf98%22 font-family=%22serif%22%3EM%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="locked">
+
+<!-- ============ GATE ============ -->
+<div id="gate" role="dialog" aria-label="Enter Marlowe">
+  <div class="gate-inner">
+    <div class="mark">M</div>
+    <p class="eyebrow">Marlowe · Private Cinema · Est. 1926</p>
+    <h1 class="gate-title">An evening<br><em>made for you alone.</em></h1>
+    <button id="enter" class="btn gold">Enter the theater</button>
+    <button id="enterQuiet" class="btn ghost small">Enter without sound</button>
+    <p class="gate-note">🎧 Sound on recommended.<br><span>Content note: this site contains a jump scare and horror imagery. No flashing lights.</span></p>
+  </div>
+</div>
+
+<!-- persistent layers -->
+<canvas id="grain" aria-hidden="true"></canvas>
+<div id="vignette" aria-hidden="true"></div>
+<div id="shadows" aria-hidden="true"></div>
+<div id="flash" aria-hidden="true"></div>
+<div id="dim" aria-hidden="true"></div>
+
+<header id="nav">
+  <a class="logo" href="#top"><span class="mark sm">M</span>MARLOWE</a>
+  <nav><a href="#rooms">The Rooms</a><a href="#packages">Packages</a><a href="#faq">FAQ</a></nav>
+  <a class="btn gold small" href="#book">Book</a>
+</header>
+
+<main id="top">
+
+<!-- ============ HERO ============ -->
+<section id="hero" class="sec" data-d="0">
+  <div class="hero-bg"><img src="img/hero.webp" alt="Marlowe auditorium with velvet seats" fetchpriority="high"><img class="hero-dark" src="img/hero-dark.webp" alt=""></div>
+  <div class="hero-copy">
+    <p class="eyebrow">Private Cinema · Members & Guests</p>
+    <h1>The finest seat in the city<br><em>is yours alone.</em></h1>
+    <p class="lede">Twelve hand-stitched velvet recliners. A 7.3-metre screen. Sound you feel in your chest. Hire the entire Marlowe for birthdays, proposals, premieres, or a quiet night with <span class="swap" data-to="whoever is already here">the people you love</span>.</p>
+    <div class="cta"><a class="btn gold" href="#book">Book a private screening</a><a class="btn ghost" href="#rooms">Tour the rooms</a></div>
+  </div>
+  <ul class="stats">
+    <li><b>12</b><span>Velvet seats</span></li>
+    <li><b>7.3m</b><span>Screen width</span></li>
+    <li><b>4K</b><span>RGB laser</span></li>
+    <li><b>9.1.4</b><span>Dolby Atmos</span></li>
+  </ul>
+</section>
+
+<!-- ============ NOW SHOWING ============ -->
+<section id="showing" class="sec" data-d="0.04">
+  <div class="sec-head"><p class="eyebrow">This season at the Marlowe</p><h2>Now showing</h2><p class="sub">Choose from our curated programme, or bring your own film in any format.</p></div>
+  <div class="posters">
+    <figure class="poster"><img src="img/poster-moon.webp" alt="" loading="lazy"><figcaption><b>Midnight on the Roof</b><span>1954 · Romance · Restored 4K</span></figcaption></figure>
+    <figure class="poster"><img src="img/poster-light.webp" alt="" loading="lazy"><figcaption><b>The Keeper's Light</b><span>1961 · Mystery · 35mm</span></figcaption></figure>
+    <figure class="poster giggles" id="g1"><span class="ribbon">Coming soon</span><img src="img/giggles1.webp" alt="" loading="lazy"><figcaption><b>Giggles</b><span>1926 · Family · Silent, live organ</span></figcaption></figure>
+  </div>
+</section>
+
+<!-- ============ SPECS ============ -->
+<section id="specs" class="sec" data-d="0.1">
+  <div class="sec-head"><p class="eyebrow">The room</p><h2>Built for the film.<br><em>Not the crowd.</em></h2></div>
+  <div class="spec-grid">
+    <div class="spec"><i>01</i><h3>Screen</h3><p>7.3m acoustically transparent, 2.39:1 masking. Every seat sits inside the reference viewing angle.</p></div>
+    <div class="spec"><i>02</i><h3>Image</h3><p>4K RGB laser projection, 120fps, HDR. Plus a restored 35mm carbon-arc projector for the purists.</p></div>
+    <div class="spec"><i>03</i><h3>Sound</h3><p>Dolby Atmos 9.1.4 across 22 speakers. So precise you can hear <span class="swap" data-to="someone breathing behind you">a pin drop in row C</span>.</p></div>
+    <div class="spec"><i>04</i><h3>Seating</h3><p>Twelve power recliners in Italian mohair velvet, heated, with private side tables and call buttons.</p></div>
+    <div class="spec"><i>05</i><h3>Isolation</h3><p>Room-within-a-room build, NC-15 rating. <span class="swap" data-to="Nobody outside will hear a thing.">Total silence from the street.</span></p></div>
+    <div class="spec exits"><i>06</i><h3>Safety</h3><p>Emergency exits: <b id="exitCount">2</b>. Staffed by our front of house team from arrival until the very last guest leaves.</p></div>
+  </div>
+</section>
+
+<!-- ============ ROOMS ============ -->
+<section id="rooms" class="sec" data-d="0.16">
+  <div class="sec-head"><p class="eyebrow">Tour the Marlowe</p><h2>Six rooms.<br><em>One evening.</em></h2></div>
+
+  <article class="room" data-d="0.18">
+    <div class="room-img"><img src="img/hero.webp" alt="The auditorium" loading="lazy"></div>
+    <div class="room-copy"><i>I</i><h3>The Auditorium</h3><p>A star-field ceiling of 1,400 fibre-optic points, walnut panelling, and twelve seats with perfect sightlines from every one.</p><p class="fine">Capacity 12 · <span class="swap" data-to="Currently 13">Currently 0</span></p></div>
+  </article>
+
+  <article class="room flip" data-d="0.24">
+    <div class="room-img"><img src="img/lounge.webp" alt="The Emerald Lounge" loading="lazy"></div>
+    <div class="room-copy"><i>II</i><h3>The Emerald Lounge</h3><p>Green marble, brass, and a vintage poster collection. Champagne on arrival, cocktails at the interval, and a bar that stays open <span class="swap" data-to="whether you want it to or not">as late as you like</span>.</p></div>
+  </article>
+
+  <article class="room" data-d="0.32">
+    <div class="room-img"><img src="img/booth.webp" alt="The projection booth" loading="lazy"></div>
+    <div class="room-copy"><i>III</i><h3>The Projection Booth</h3><p>Where laser meets carbon arc. Our projectionist has been with the Marlowe since opening night in 1926. <span class="swap" data-to="He has never left the booth.">He knows every reel by heart.</span></p></div>
+  </article>
+
+  <article class="room flip" data-d="0.4">
+    <div class="room-img tall"><img src="img/corridor.webp" alt="The long corridor" loading="lazy"></div>
+    <div class="room-copy"><i>IV</i><h3>The Long Corridor</h3><p>Ninety feet of original velvet linking the lounge to the auditorium. The sconces are hand-blown glass from Murano. Guests often say they feel <span class="swap" data-to="followed">transported</span>.</p><p class="fine">Please don't run in the corridor. <span class="late">He doesn't like it when you run.</span></p></div>
+  </article>
+
+  <article class="room" data-d="0.48">
+    <div class="room-img"><img src="img/restroom.webp" alt="The powder room" loading="lazy"></div>
+    <div class="room-copy"><i>V</i><h3>The Powder Room</h3><p>Art deco tile and a gilded mirror original to the building. Recently refurbished. <span class="swap" data-to="Do not look at the mirror for too long.">Mostly.</span></p></div>
+  </article>
+
+  <article class="room flip" data-d="0.56">
+    <div class="room-img"><img src="img/archive.webp" alt="The archive" loading="lazy"></div>
+    <div class="room-copy"><i>VI</i><h3>The Archive</h3><p>Four thousand reels, including the only surviving print of <em>Giggles</em> (1926). Costumes from the original production are stored here. <span class="swap" data-to="Most of them.">All of them.</span></p><p class="fine redacted">Staff only. ████ ███ ████ ██ █████.</p></div>
+  </article>
+</section>
+
+<!-- ============ GIGGLES RETURNS ============ -->
+<section id="returns" class="sec" data-d="0.62">
+  <div class="returns-wrap">
+    <figure class="poster giggles big" id="g2"><span class="ribbon red">Back by demand</span><img src="img/giggles2.webp" alt="" loading="lazy"><figcaption><b>Giggles</b><span>1926 · Family · Silent</span></figcaption></figure>
+    <div class="returns-copy">
+      <p class="eyebrow">Members' favourite</p>
+      <h2>He's back by<br><em>popular demand.</em></h2>
+      <p>Audiences loved <em>Giggles</em> so much that <span class="swap" data-to="none of them went home.">we brought it back for a third season.</span> Screened from the original nitrate print with live organ accompaniment.</p>
+      <p class="whisper">He's been asking about you.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SEATS ============ -->
+<section id="seats" class="sec" data-d="0.68">
+  <div class="sec-head"><p class="eyebrow">Choose your seat</p><h2>Every seat is<br><em>the best seat.</em></h2><p class="sub">Tap a seat to reserve it for your screening.</p></div>
+  <div class="screen-bar">SCREEN</div>
+  <div id="seatmap" class="seatmap" role="group" aria-label="Seat map"></div>
+  <p id="seatMsg" class="seat-msg">&nbsp;</p>
+</section>
+
+<!-- ============ PACKAGES ============ -->
+<section id="packages" class="sec" data-d="0.74">
+  <div class="sec-head"><p class="eyebrow">Packages</p><h2>Stay as long<br><em>as you like.</em></h2></div>
+  <div class="pkgs">
+    <div class="pkg"><h3>The Matinee</h3><p class="price">$480<small> / 3 hrs</small></p><ul><li>Up to 12 guests</li><li>Popcorn & soft drinks bar</li><li>Any film from our programme</li></ul><a class="btn ghost small" href="#book">Reserve</a></div>
+    <div class="pkg feat"><span class="tag">Most popular</span><h3>The Premiere</h3><p class="price">$1,200<small> / evening</small></p><ul><li>Red carpet arrival & photographer</li><li>Champagne and a chef's tasting menu</li><li>Your film, any format</li><li><span class="swap" data-to="An extra guest. Uninvited.">A surprise guest appearance</span></li></ul><a class="btn gold small" href="#book">Reserve</a></div>
+    <div class="pkg cursed"><h3>The Final Act</h3><p class="price">Everything<small> / forever</small></p><ul><li>One guest. You.</li><li>No end time</li><li>Exits not included</li><li>He chooses the film</li></ul><a class="btn ghost small" href="#book">It's already reserved</a></div>
+  </div>
+</section>
+
+<!-- ============ TESTIMONIALS ============ -->
+<section id="reviews" class="sec" data-d="0.8">
+  <div class="sec-head"><p class="eyebrow">Guest notes</p><h2>What our guests<br><em>are saying.</em></h2></div>
+  <div class="revs">
+    <blockquote class="rev"><span class="stars">★★★★★</span><p>Booked the whole room for my wife's 40th. Flawless from the first glass of champagne to the last frame.</p><cite>Daniel R. · Anniversary</cite></blockquote>
+    <blockquote class="rev"><span class="stars">★★★★★</span><p>The Atmos is unreal. You can hear someone breathing in the seat behind you. We were the only two people booked.</p><cite>Priya K. · Date night</cite></blockquote>
+    <blockquote class="rev"><span class="stars">★★★★★</span><p>Kids loved the clown in the lobby. Staff said they don't have a clown. Kids still talk to him.</p><cite>Marcus T. · Birthday party</cite></blockquote>
+    <blockquote class="rev"><span class="stars">★★★★★</span><p>We stayed for the credits. We're still staying. The credits haven't ended.</p><cite>The Okafors · Party of 6</cite></blockquote>
+    <blockquote class="rev last"><span class="stars">★★★★★</span><p class="help">help us he is in the seats he is in the walls he is in the poster he is not in the poster</p><cite>— row C</cite></blockquote>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section id="faq" class="sec" data-d="0.86">
+  <div class="sec-head"><p class="eyebrow">Before you arrive</p><h2>Questions</h2></div>
+  <div class="faqs">
+    <details><summary>Can I bring my own film?</summary><p>Of course. DCP, Blu-ray, 35mm, or a file on a USB. Our projectionist will test it before you arrive.</p></details>
+    <details><summary>Is there parking?</summary><p>Complimentary valet. Your car will be waiting for you when you leave.</p></details>
+    <details><summary>What is your cancellation policy?</summary><p>Free cancellation up to 48 hours before. Once you have taken your seat, there is nothing left to cancel.</p></details>
+    <details><summary>Are children welcome?</summary><p>He loves children.</p></details>
+    <details><summary>Why is there no exit sign?</summary><p>You won't be needing one.</p></details>
+    <details><summary>Who is in seat C4?</summary><p class="redacted">██████ ██ ████ ████ ██ ████ █████ ███ ████. He has had that seat since 1926.</p></details>
+  </div>
+</section>
+
+<!-- ============ BOOKING ============ -->
+<section id="book" class="sec" data-d="0.9">
+  <div class="sec-head"><p class="eyebrow">Reservations</p><h2>Book your<br><em>private screening.</em></h2><p class="sub">We'll take it from here.</p></div>
+  <form id="bookForm" class="book" autocomplete="off" onsubmit="return false">
+    <label>Name<input data-fill="you" readonly></label>
+    <label>Date<input data-fill="tonight. it was always tonight." readonly></label>
+    <label>Party size<input data-fill="1 + 1" readonly></label>
+    <label>Film<input data-fill="GIGGLES (1926)" readonly></label>
+    <label>Seat<input data-fill="C5 · beside him" readonly></label>
+    <label class="wide">Special requests<input data-fill="don't turn around" readonly></label>
+    <button id="confirm" class="btn gold wide" type="button">Confirm booking</button>
+    <p id="bookMsg" class="book-msg">&nbsp;</p>
+  </form>
+</section>
+
+<!-- ============ CORRIDOR ============ -->
+<section id="corridor" class="sec" data-d="0.96">
+  <div class="dark-room">
+    <img src="img/corridor.webp" alt="" class="cor-img" loading="lazy">
+    <div class="cor-text t1">Your screening room is at the end of the hall.</div>
+    <div class="cor-text t2">Follow the light.</div>
+    <figure class="poster giggles empty" id="g3"><img src="img/giggles4.webp" alt="" loading="lazy"><figcaption><b>Giggles</b><span>Now showing</span></figcaption></figure>
+    <div class="cor-text t3">He's not in his poster.</div>
+    <div class="cor-text t4">Your seat is ready.</div>
+    <div id="trigger"></div>
+  </div>
+  <div id="flashlight" aria-hidden="true"></div>
+</section>
+<div class="tail"></div>
+
+</main>
+
+<!-- ============ SCARE + END ============ -->
+<div id="scare" aria-hidden="true"><img src="img/clown.webp" alt=""></div>
+
+<div id="end" role="dialog" aria-label="Thank you">
+  <div class="end-inner">
+    <div class="mark">M</div>
+    <p class="eyebrow">Marlowe · Private Cinema</p>
+    <h2>Thank you for choosing<br><em>the Marlowe.</em></h2>
+    <p class="lede">You were a wonderful audience. Your seat will be kept warm.<br>Now taking private bookings for 2027.</p>
+    <div class="cta">
+      <a id="share" class="btn gold" target="_blank" rel="noopener">Share your screening on X</a>
+      <button id="replay" class="btn ghost">Watch again</button>
+    </div>
+    <p class="fine">Marlowe is fictional. No real cinema, clown or projectionist was harmed. · made by <a href="https://x.com/voidhl" target="_blank" rel="noopener">@voidhl</a></p>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
